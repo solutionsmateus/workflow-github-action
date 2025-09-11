@@ -11,7 +11,17 @@ jobs:
   build:
     runs-on: windows-latest
     permissions:
-      contents: read   # necessário para checkout com GITHUB_TOKEN
+      contents: read 
+    strategy:
+     matrix:
+      scripts:
+       - assai.py
+       - atacadão.py
+       - novoatacarejo.py
+       - frangolandia.py
+       - cometa.py
+       - atakarejo.py
+       - gbarbosa.py
 
     steps:
       - name: Checkout (repo atual)
@@ -32,10 +42,10 @@ jobs:
       - name: Checkout de outro repositório
         uses: actions/checkout@v4
         with:
-          repository: solutionsmateus/supermercados-code  # sem https://
+          repository: solutionsmateus/supermercados-code
           ref: main
-          path: supermercados-code                       # pasta de destino
-
+          path: supermercados-code
+                   
       - name: Setup Python 3.12 (com cache pip)
         uses: actions/setup-python@v5
         with:
@@ -54,15 +64,11 @@ jobs:
         shell: pwsh
         run: New-Item -ItemType Directory -Force -Path Encartes | Out-Null
 
-      - name: Rodar script (exemplo)
+      - name: Executar scripts em matrix
         shell: pwsh
-        run: |
-          # ajuste o caminho/nome do script conforme a repo
-          if (Test-Path "supermercados-code/app.py") {
-            python supermercados-code/app.py
-          } else {
-            Write-Host "Script não encontrado, pulando execução."
-          }
+        working-directory: supermercados-code
+        run: | 
+         python "${{ matrix.script }}"
 
   deploy:
     needs: build
