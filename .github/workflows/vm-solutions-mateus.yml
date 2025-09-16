@@ -7,7 +7,13 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
   schedule:
-    - cron: '0 15 * * 4'
+    - cron: '0 10 * * 0' #Domingo
+    - cron: '0 10 * * 1' #Segunda-Feira
+    - cron: '0 10 * * 2' #Terça-Feira
+    - cron: '0 10 * * 3' #Quarta - Feira
+    - cron: '0 10 * * 4' #Quinta - Feira
+    - cron: '0 10 * * 5' #Sexta-Feira
+    - cron: '0 10 * * 6' #Sábado 
 
 jobs:
   build:
@@ -18,7 +24,7 @@ jobs:
       matrix:
         scripts:
           - assai.py
-          - atacadao.py        # <-- renomeie no repo para evitar acento
+          - atacadao.py 
           - novoatacarejo.py
           - frangolandia.py
           - cometa.py
@@ -53,7 +59,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
-          # cache-dependency-path: supermercados-code/requirements.txt  # opcional, melhora o cache
+          cache-dependency-path: supermercados-code/requirements.txt
 
       - name: Instalar dependências (se existir requirements.txt)
         shell: pwsh
