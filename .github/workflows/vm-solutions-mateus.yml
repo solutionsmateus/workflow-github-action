@@ -90,10 +90,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: encartes-${{ github.run_id }}
-          if-no-files-found: warn
-          path: |
-            Encartes/**
-            supermercados-code/Encartes/**
-            **/*.xlsx
-            **/*.csv
+         name: encartes-${{ github.run_id }}-${{ matrix.scripts }}-attempt${{ github.run_attempt }}
+         if-no-files-found: warn
+         path: |
+          Encartes/**
+          supermercados-code/Encartes/**
+          **/*.xlsx
+          **/*.csv
+
