@@ -16,7 +16,7 @@ jobs:
       contents: read
     env:
       # Pasta única de saída; use este caminho nos scripts (via env OUTPUT_DIR)
-      OUTPUT_DIR: ${{ github.workspace }}\Encartes
+      OUTPUT_DIR: ${{ github.workspace }}/Encartes
     strategy:
       matrix:
         scripts:
@@ -86,15 +86,24 @@ jobs:
           echo "OUTPUT_DIR=$env:OUTPUT_DIR"
           python "${{ matrix.scripts }}"
 
+      - name: Debug OUTPUT_DIR
+        shell: pwsh
+        run: |
+          Write-Host "OUTPUT_DIR=$env:OUTPUT_DIR"
+          if (Test-Path "$env:OUTPUT_DIR") {
+            $files = Get-ChildItem "$env:OUTPUT_DIR" -Recurse -File
+            $count = ($files | Measure-Object).Count
+            Write-Host "Total de arquivos em OUTPUT_DIR: $count"
+            $files | Select-Object FullName, Length
+            if ($count -eq 0) {
+              "Nenhum arquivo gerado por $env:Matrix_scripts" | Out-File -Encoding utf8 "$env:OUTPUT_DIR/README.txt"
+            }
+          }
+
       - name: Upload arquivos gerados
         if: always()
         uses: actions/upload-artifact@v4
         with:
-         name: encartes-${{ github.run_id }}-${{ matrix.scripts }}-attempt${{ github.run_attempt }}
-         if-no-files-found: warn
-         path: |
-          Encartes/**
-          supermercados-code/Encartes/**
-          **/*.xlsx
-          **/*.csv
-
+          name: encartes-${{ github.run_id }}-${{ matrix.scripts }}-attempt${{ github.run_attempt }}
+          if-no-files-found: warn
+          path: ${{ env.OUTPUT_DIR }}/**
