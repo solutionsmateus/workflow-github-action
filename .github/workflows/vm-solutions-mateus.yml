@@ -16,7 +16,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        script:
+        scripts:
           - assai.py
           - atacadao.py        # <-- renomeie no repo para evitar acento
           - novoatacarejo.py
