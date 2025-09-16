@@ -64,10 +64,19 @@ jobs:
           echo "PWD: $PWD"
           Get-ChildItem -Recurse -Depth 2 | Select-Object FullName
 
+      - name: Checkout de outro repositório
+        uses: actions/checkout@v4
+        with:
+         repository: solutionsmateus/supermercados-code
+         ref: main
+         path: supermercados-code
+
       - name: Executar scripts da matrix
         shell: pwsh
+        working-directory: supermercados-code  
         run: |
-          python "${{ matrix.scripts }}"
+         python "${{ matrix.scripts }}"
+
 
       - name: Upload arquivos gerados
         if: always()
