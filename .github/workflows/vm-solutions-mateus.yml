@@ -14,6 +14,9 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read
+    env:
+      # Pasta única de saída; use este caminho nos scripts (via env OUTPUT_DIR)
+      OUTPUT_DIR: ${{ github.workspace }}\Encartes
     strategy:
       matrix:
         scripts:
@@ -54,33 +57,43 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Criar pasta Encartes
+      - name: Garantir pasta de saída (Encartes)
         shell: pwsh
-        run: New-Item -ItemType Directory -Force -Path Encartes | Out-Null
+        run: New-Item -ItemType Directory -Force -Path "$env:OUTPUT_DIR" | Out-Null
+
+      - name: Checkout de outro repositório
+        uses: actions/checkout@v4
+        with:
+          repository: solutionsmateus/supermercados-code
+          ref: main
+          path: supermercados-code
 
       - name: Listar arquivos (debug)
         shell: pwsh
         run: |
           echo "PWD: $PWD"
+          Write-Host "Raiz:"
           Get-ChildItem -Recurse -Depth 2 | Select-Object FullName
-
-      - name: Checkout de outro repositório
-        uses: actions/checkout@v4
-        with:
-         repository: solutionsmateus/supermercados-code
-         ref: main
-         path: supermercados-code
+          Write-Host "supermercados-code/:"
+          if (Test-Path .\supermercados-code) {
+            Get-ChildItem .\supermercados-code -Recurse -Depth 2 | Select-Object FullName
+          }
 
       - name: Executar scripts da matrix
         shell: pwsh
-        working-directory: supermercados-code  
+        working-directory: supermercados-code
         run: |
-         python "${{ matrix.scripts }}"
-
+          echo "OUTPUT_DIR=$env:OUTPUT_DIR"
+          python "${{ matrix.scripts }}"
 
       - name: Upload arquivos gerados
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: encartes-${{ github.run_id }}
-          path: Encartes/**
+          if-no-files-found: warn
+          path: |
+            Encartes/**
+            supermercados-code/Encartes/**
+            **/*.xlsx
+            **/*.csv
