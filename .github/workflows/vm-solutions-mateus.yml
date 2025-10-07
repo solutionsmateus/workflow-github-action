@@ -22,7 +22,6 @@ jobs:
       matrix:
         scripts:
           - atacadao.py
-          - novoatacarejo.py
           - frangolandia.py
           - cometa.py
           - atakarejo.py
