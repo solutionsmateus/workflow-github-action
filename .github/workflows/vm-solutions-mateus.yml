@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         scripts:
-         # - assai.py
+          - assai.py
           - novoatacarejo.py
           - atacadao.py
           - frangolandia.py
