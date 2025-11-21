@@ -22,7 +22,7 @@ jobs:
       matrix:
         scripts:
           - assai.py
-          - novoatacarejo.py
+        #  - novoatacarejo.py
           - atacadao.py
           - frangolandia.py
           - cometa.py
