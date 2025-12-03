@@ -21,13 +21,13 @@ jobs:
     strategy:
       matrix:
         scripts:
-          - assai.py
+         # - assai.py
           - novoatacarejo.py
           - atacadao.py
           - frangolandia.py
           - cometa.py
           - atakarejo.py
-          - gbarbosa.py
+         # - gbarbosa.py
 
     steps:
       - name: Checkout (repo atual)
