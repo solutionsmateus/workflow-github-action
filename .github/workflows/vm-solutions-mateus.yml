@@ -27,7 +27,7 @@ jobs:
           - frangolandia.py
           - cometa.py
           - atakarejo.py
-         # - gbarbosa.py
+          - gbarbosa.py
 
     steps:
       - name: Checkout (repo atual)
