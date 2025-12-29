@@ -40,6 +40,13 @@ jobs:
           lfs: true
           submodules: recursive
 
+      - name: Forçar UTF-8 Codepage (chcp 65001) para o Console do Windows
+        shell: pwsh
+        run: |
+          chcp 65001
+          # Opcional: Para garantir que o Python use UTF-8 no stdout
+          $env:PYTHONIOENCODING = "utf8"
+
       - name: Ajustes Git no Windows (opcional)
         shell: pwsh
         run: |
