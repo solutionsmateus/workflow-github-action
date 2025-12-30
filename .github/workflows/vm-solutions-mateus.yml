@@ -7,7 +7,7 @@ on:
     branches: ["main"]
   workflow_dispatch:
   schedule:
-    - cron: '0 10 * * *'  # todos os dias às 9:00 UTC
+    - cron: '0 10 * * *'  # todos os dias às 8:00 UTC
 
 jobs:
   build:
@@ -15,11 +15,13 @@ jobs:
     permissions:
       contents: write
     env:
+      # Configurações de Locale
+      LANG: pt-BR      
+      LC_ALL: pt-BR   
       # Pasta única de saída; use este caminho nos scripts (via env OUTPUT_DIR)
       OUTPUT_DIR: ${{ github.workspace }}/Encartes
       HTTP_UA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
-      LANG: pt-BR      
-      LC_ALL: pt-BR   
+      
     strategy:
       matrix:
         scripts:
@@ -32,7 +34,7 @@ jobs:
           - gbarbosa.py
 
     steps:
-      - name: Checkout (repo atual)
+      - name: 1. Checkout (repo atual)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -40,45 +42,47 @@ jobs:
           lfs: true
           submodules: recursive
 
-      - name: Forçar UTF-8 Codepage (chcp 65001) para o Console do Windows
-        shell: pwsh
-        run: |
-          chcp 65001
-          # Opcional: Para garantir que o Python use UTF-8 no stdout
-          $env:PYTHONIOENCODING = "utf8"
-
-      - name: Ajustes Git no Windows (opcional)
+      - name: 2. Ajustes Git no Windows (opcional)
         shell: pwsh
         run: |
           git config --global user.name "user"
           git config --global user.email "usermail10@gmail.com"
           git config --global core.longpaths true
 
-      - name: Setup Python 3.12 (com cache pip)
+      - name: 3. CORREÇÃO UTF-8 - Forçar Codepage 65001 (Windows)
+        shell: pwsh
+        run: |
+          # Define a página de código ativa do console para UTF-8 (65001)
+          chcp 65001
+          # Garante que o Python use UTF-8 para entrada/saída (stdin/stdout)
+          $env:PYTHONIOENCODING = "utf8" 
+          Write-Host "Codepage e PYTHONIOENCODING definidos para UTF-8."
+          
+      - name: 4. Setup Python 3.12 (com cache pip)
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
           cache-dependency-path: requirements.txt
 
-      - name: Instalar dependências
+      - name: 5. Instalar dependências
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Garantir pasta de saída (Encartes)
+      - name: 6. Garantir pasta de saída (Encartes)
         shell: pwsh
         run: New-Item -ItemType Directory -Force -Path "$env:OUTPUT_DIR" | Out-Null
 
-      - name: Checkout de outro repositório
+      - name: 7. Checkout de outro repositório
         uses: actions/checkout@v4
         with:
           repository: solutionsmateus/supermercados-code
           ref: main
           path: supermercados-code
 
-      - name: Listar arquivos (debug)
+      - name: 8. Listar arquivos (debug)
         shell: pwsh
         run: |
           echo "PWD: $PWD"
@@ -89,14 +93,14 @@ jobs:
             Get-ChildItem .\supermercados-code -Recurse -Depth 2 | Select-Object FullName
           }
 
-      - name: Executar scripts da matrix
+      - name: 9. Executar scripts da matrix
         shell: pwsh
         working-directory: supermercados-code
         run: |
           echo "OUTPUT_DIR=$env:OUTPUT_DIR"
           python "${{ matrix.scripts }}"
 
-      - name: Debug OUTPUT_DIR
+      - name: 10. Debug OUTPUT_DIR
         shell: pwsh
         run: |
           Write-Host "OUTPUT_DIR=$env:OUTPUT_DIR"
@@ -110,7 +114,7 @@ jobs:
             }
           }
 
-      - name: Upload arquivos gerados
+      - name: 11. Upload arquivos gerados
         if: always()
         uses: actions/upload-artifact@v4
         with:
